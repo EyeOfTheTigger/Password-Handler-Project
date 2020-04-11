@@ -97,20 +97,26 @@ password = Entry(window)
 
 
 def enter():
-#    print(site.get() in pass_pot)
-    if(site.get() in pass_pot):
-        warning = Tk()
-        def overw():
-            pass_pot[site.get()] = password.get()
-            warning.destroy()
-        warning.title('WARNING - passhandler')
-        overwrite = Button(warning, text = 'OVERWRITE', command = overw)
-        message = Label(warning, text = f'Data for this site already exists\nPassword:{pass_pot[site.get()]}.\nClick on overwrite to continue with action')
-        message.pack()
-        overwrite.pack()
-        warning.mainloop()
-        return
-    pass_pot[site.get()] = password.get()
+#    print(site.get() in pass_pot)  
+#    should probably check for empty string
+    if(not password.get().isspace or not site.get().isspace or not password.get() =='' or not site.get() == ''):
+        if(site.get() in pass_pot and pass_pot[site.get()]!=password.get()):
+            warning = Tk()
+            def overw():
+                pass_pot[site.get()] = password.get()
+                warning.destroy()
+            warning.title('WARNING - passhandler')
+            overwrite = Button(warning, text = 'OVERWRITE', command = overw, bg = 'red')
+            message = Label(warning, text = f'Data for this site already exists\nPassword:{pass_pot[site.get()]}.\nClick on overwrite to continue with action')
+            message.pack()
+            overwrite.pack()
+            warning.mainloop()
+            return
+        pass_pot[site.get()] = password.get()
+        passw_txt = open(os.path.join(s,'passhandler','password_list.txt'),'w')
+        for x in pass_pot.bag:
+            passw_txt.write(f'{x}:{pass_pot.bag[x]}\n')
+        passw_txt.close()    
 #   print(pass_pot.bag)
 
 
@@ -125,18 +131,23 @@ def pass_gen(s = 16): # default password size for good strength is 16 !
     password.insert(10, result)
 
 
-def end():
+#def end():
 #    print(pass_pot.bag)
-    passwords = open(os.path.join(s,'passhandler','password_list.txt'), 'w' )  #- closing sequence, open a clean txt file and write the dictionary to it.
-    for x in pass_pot.bag:
-        passwords.write(f'{x}:{pass_pot.bag[x]}\n')
-    passwords.close()
-    window.destroy()
+#    passwords = open(os.path.join(s,'passhandler','password_list.txt'), 'w' )  #- closing sequence, open a clean txt file and write the dictionary to it.
+#    for x in pass_pot.bag:
+#        passwords.write(f'{x}:{pass_pot.bag[x]}\n')
+#    passwords.close()
+#    window.destroy()
 
 
 def find():
     password.delete(0, END)
     s = pass_pot[site.get()]
+    if(s=='Data for site not available'):
+        for x in pass_pot.bag:
+            if(site.get() in x):
+                s = pass_pot[x]
+                break
     password.insert(10, s)
 
 
@@ -159,12 +170,12 @@ window.title('Passhandler')
 title = Label(window, text = 'Welcome to passhandler.\nPress Enter to store password data or End to terminate the program.\nPress End for succesful storage of passwords')
 find = Button(window, text = 'Find', command = find)
 find.grid(row = 1, column = 2)
-enter = Button(window, text = 'Enter', command=enter)
-end = Button(window, text = 'End', command = end)
-delete = Button(window, text = 'Delete', command = delete)
-generate = Button(window, text = 'generate password', command = pass_gen)
+enter = Button(window, text = 'Enter', command=enter, bg = 'blue')
+#end = Button(window, text = 'End', command = end)
+delete = Button(window, text = 'Delete', command = delete, bg = 'red')
+generate = Button(window, text = 'generate password', command = pass_gen, bg = 'green')
 generate.grid(row = 2, column = 2)
-s_label = Label(window, text = 'site name (Please enter full url for perfect sync): ')
+s_label = Label(window, text = 'Site name (preferably the url): ')
 s_label.grid(row = 1, column = 0)
 site.grid(row = 1, column = 1)
 p_label = Label(window, text = 'password: ')
@@ -172,7 +183,7 @@ p_label.grid(row = 2, column = 0)
 password.grid(row = 2, column = 1)
 title.grid(row = 0, column =1)
 enter.grid(row = 3, column = 1)
-end.grid(row = 3, column = 0)
+#end.grid(row = 3, column = 0)
 delete.grid(row = 3, column = 2)
 #enter.grid(row=4, column = 0)
 #end.grid(row = 4, column = 3)
